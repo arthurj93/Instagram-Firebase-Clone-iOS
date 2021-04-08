@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SignUpController" customModule="Instagram_Clone_iOS" customModuleProvider="target">
+            <connections>
+                <outlet property="alreadyHaveAccountButton" destination="kmV-4S-S5J" id="LOt-r6-R8j"/>
+                <outlet property="emailTextField" destination="4Oh-o6-suM" id="POw-Tt-rt6"/>
+                <outlet property="passwordTextField" destination="GF4-aX-kSf" id="LQm-fk-ltd"/>
+                <outlet property="plusPhotoButton" destination="UDq-ey-aTp" id="Tzr-mE-YQe"/>
+                <outlet property="signUpButton" destination="bwy-Sg-UBA" id="K4S-O4-6gr"/>
+                <outlet property="usernameTextField" destination="DJQ-lS-agp" id="QHe-6b-oT7"/>
+                <outlet property="view" destination="ue5-LI-Yiz" id="kCO-vE-Gnt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="ue5-LI-Yiz">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UDq-ey-aTp">
+                    <rect key="frame" x="137" y="84" width="140" height="140"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="140" id="P3R-jl-o4V"/>
+                        <constraint firstAttribute="height" constant="140" id="kyJ-pd-zp2"/>
+                    </constraints>
+                    <state key="normal" image="plus_photo"/>
+                </button>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="41t-TZ-fpn">
+                    <rect key="frame" x="40" y="244" width="334" height="200"/>
+                    <subviews>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4Oh-o6-suM">
+                            <rect key="frame" x="0.0" y="0.0" width="334" height="42.5"/>
+                            <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DJQ-lS-agp">
+                            <rect key="frame" x="0.0" y="52.5" width="334" height="42.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GF4-aX-kSf">
+                            <rect key="frame" x="0.0" y="105" width="334" height="42.5"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                        </textField>
+                        <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bwy-Sg-UBA">
+                            <rect key="frame" x="0.0" y="157.5" width="334" height="42.5"/>
+                            <color key="backgroundColor" red="0.58431372549019611" green="0.80000000000000004" blue="0.95686274509803915" alpha="1" colorSpace="calibratedRGB"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                            <state key="normal" title="Sign Up">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </state>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="200" id="hOu-w4-SfA"/>
+                    </constraints>
+                </stackView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kmV-4S-S5J">
+                    <rect key="frame" x="0.0" y="812" width="414" height="50"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="eyF-We-ljK"/>
+                    </constraints>
+                    <state key="normal" title="Already have an account? Sign In"/>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="bAY-s8-ViP"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="41t-TZ-fpn" firstAttribute="top" secondItem="UDq-ey-aTp" secondAttribute="bottom" constant="20" id="39y-n4-eqg"/>
+                <constraint firstItem="UDq-ey-aTp" firstAttribute="top" secondItem="bAY-s8-ViP" secondAttribute="top" constant="40" id="3LA-OM-PEZ"/>
+                <constraint firstItem="kmV-4S-S5J" firstAttribute="trailing" secondItem="bAY-s8-ViP" secondAttribute="trailing" id="G5g-pt-BoL"/>
+                <constraint firstItem="UDq-ey-aTp" firstAttribute="centerX" secondItem="ue5-LI-Yiz" secondAttribute="centerX" id="PyA-49-KKD"/>
+                <constraint firstItem="bAY-s8-ViP" firstAttribute="trailing" secondItem="41t-TZ-fpn" secondAttribute="trailing" constant="40" id="WWc-qf-bXt"/>
+                <constraint firstItem="kmV-4S-S5J" firstAttribute="leading" secondItem="bAY-s8-ViP" secondAttribute="leading" id="iGG-aw-xtI"/>
+                <constraint firstItem="41t-TZ-fpn" firstAttribute="leading" secondItem="bAY-s8-ViP" secondAttribute="leading" constant="40" id="mdq-6V-57C"/>
+                <constraint firstItem="bAY-s8-ViP" firstAttribute="bottom" secondItem="kmV-4S-S5J" secondAttribute="bottom" id="pqb-yL-XIg"/>
+            </constraints>
+            <point key="canvasLocation" x="139" y="66"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="plus_photo" width="150" height="150"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
