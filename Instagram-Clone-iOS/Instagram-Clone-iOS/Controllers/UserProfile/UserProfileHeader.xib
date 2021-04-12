@@ -23,7 +23,6 @@
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TQf-kN-SEG">
                                 <rect key="frame" x="12" y="12" width="80" height="80"/>
-                                <color key="backgroundColor" red="0.83297318220000005" green="0.41856870060000001" blue="0.20384734869999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="80" id="TEJ-Y1-mSJ"/>
                                     <constraint firstAttribute="width" constant="80" id="XDP-e6-Egm"/>
@@ -131,7 +130,7 @@
             <size key="customSize" width="478" height="191"/>
             <connections>
                 <outlet property="containerView" destination="ztm-9n-cCB" id="CUT-vs-3Kp"/>
-                <outlet property="editProfileButton" destination="5WM-U8-ws4" id="yBD-dh-2wC"/>
+                <outlet property="editProfileFollowButton" destination="5WM-U8-ws4" id="7JD-MA-G4b"/>
                 <outlet property="followersLabel" destination="ETW-v9-Ahi" id="xNg-MS-0NX"/>
                 <outlet property="followingLabel" destination="z0P-Ei-biA" id="yfc-4G-nVN"/>
                 <outlet property="postsLabel" destination="myg-j0-XKl" id="6W6-97-2gq"/>

@@ -11,6 +11,8 @@ import Firebase
 class UserProfileController: UICollectionViewController {
 
     var user: User?
+    var userId: String?
+    var posts: [Post] = .init()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,9 +20,27 @@ class UserProfileController: UICollectionViewController {
         collectionView.register(UINib(nibName: UserProfileHeader.cellId, bundle: nil),
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: UserProfileHeader.cellId)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cellId")
+        collectionView.register(UINib(nibName: UserProfileCell.cellId, bundle: nil), forCellWithReuseIdentifier: UserProfileCell.cellId)
         fetchUser()
         setupLogOutButton()
+//        fetchOrderedPosts()
+    }
+
+    fileprivate func fetchOrderedPosts() {
+        guard let uid = user?.uid else { return }
+        let database = Database.database().reference().child("posts").child(uid)
+        database.queryOrdered(byChild: "creationDate").observe(.childAdded) { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: Any] else { return }
+            guard let user = self.user else { return }
+            let post: Post = .init(user: user, dictionary: dictionary)
+            //checar isso
+//            self.posts.append(post)
+            self.posts.insert(post, at: 0)
+            self.collectionView.reloadData()
+        } withCancel: { (error) in
+            print("Failed to fetch ordered posts:", error)
+        }
+
     }
 
     fileprivate func setupLogOutButton() {
@@ -51,14 +71,15 @@ class UserProfileController: UICollectionViewController {
     }
 
     private func fetchUser() {
+        let uid = userId ?? Auth.auth().currentUser?.uid ?? ""
         let database = Database.database().reference().child("users")
-        guard let uid = Auth.auth().currentUser?.uid else { return }
         database.child(uid).observe(.value) { (snapshot) in
             print(snapshot.value ?? "")
             guard let dictionary = snapshot.value as? [String: Any] else { return }
-            self.user = .init(dictionary: dictionary)
+            self.user = .init(uid: uid, dictionary: dictionary)
             self.navigationItem.title = self.user?.username
             self.collectionView.reloadData()
+            self.fetchOrderedPosts()
         } withCancel: { (error) in
             print(error)
         }
@@ -69,12 +90,13 @@ class UserProfileController: UICollectionViewController {
 
 extension UserProfileController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        return posts.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellId", for: indexPath) as? UICollectionViewCell else { return .init() }
-        cell.backgroundColor = .purple
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserProfileCell.cellId, for: indexPath) as? UserProfileCell else { return .init() }
+        let post = posts[indexPath.item]
+        cell.post = post
         return cell
     }
 
@@ -102,15 +124,5 @@ extension UserProfileController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return .init(width: collectionView.bounds.width, height: 200)
-    }
-}
-
-struct User {
-    let username: String
-    let profileImageUrl: String
-
-    init(dictionary: [String: Any]) {
-        self.username = dictionary["username"] as? String ?? ""
-        self.profileImageUrl = dictionary["profileImageUrl"] as? String ?? ""
     }
 }

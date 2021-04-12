@@ -34,3 +34,10 @@ extension UIViewController {
         }
     }
 }
+
+
+extension UINavigationController {
+    open override var prefersStatusBarHidden: Bool {
+        return topViewController?.prefersStatusBarHidden ?? true
+    }
+}
