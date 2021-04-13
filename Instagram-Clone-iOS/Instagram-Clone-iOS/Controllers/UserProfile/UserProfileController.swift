@@ -13,6 +13,8 @@ class UserProfileController: UICollectionViewController {
     var user: User?
     var userId: String?
     var posts: [Post] = .init()
+    var isFinishedPaging = false
+    var isGridView = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,27 +23,64 @@ class UserProfileController: UICollectionViewController {
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: UserProfileHeader.cellId)
         collectionView.register(UINib(nibName: UserProfileCell.cellId, bundle: nil), forCellWithReuseIdentifier: UserProfileCell.cellId)
+        collectionView.register(UINib(nibName: HomePostCell.cellId, bundle: nil), forCellWithReuseIdentifier: HomePostCell.cellId)
         fetchUser()
         setupLogOutButton()
-//        fetchOrderedPosts()
     }
 
-    fileprivate func fetchOrderedPosts() {
-        guard let uid = user?.uid else { return }
+    fileprivate func paginatePosts() {
+        let uid = userId ?? Auth.auth().currentUser?.uid ?? ""
         let database = Database.database().reference().child("posts").child(uid)
-        database.queryOrdered(byChild: "creationDate").observe(.childAdded) { (snapshot) in
-            guard let dictionary = snapshot.value as? [String: Any] else { return }
+        var query = database.queryOrderedByKey()
+//        var query = database.queryOrdered(byChild: "creationDate")
+        if posts.count > 0 {
+            guard let value = posts.last?.id else { return }
+//            guard let value = posts.last?.creationDate.timeIntervalSince1970 else { return }
+            query = query.queryEnding(atValue: value)
+        }
+        query.queryLimited(toLast: 4).observeSingleEvent(of: .value) { (snapshot) in
+
+
+            guard var allObjects = snapshot.children.allObjects as? [DataSnapshot] else { return }
+            allObjects.reverse()
+            if allObjects.count < 4 {
+                self.isFinishedPaging = true
+            }
+
+            if self.posts.count > 0 && allObjects.count > 0 {
+                allObjects.removeFirst()
+            }
+
             guard let user = self.user else { return }
-            let post: Post = .init(user: user, dictionary: dictionary)
-            //checar isso
-//            self.posts.append(post)
-            self.posts.insert(post, at: 0)
+            allObjects.forEach { (snapshot) in
+                guard let dictionary = snapshot.value as? [String: Any] else { return }
+                var post = Post(user: user, dictionary: dictionary)
+                post.id = snapshot.key
+                self.posts.append(post)
+            }
+
             self.collectionView.reloadData()
         } withCancel: { (error) in
-            print("Failed to fetch ordered posts:", error)
+            print("Failed to paginate for posts:", error)
         }
 
     }
+
+    func fetchUser() {
+        let uid = userId ?? Auth.auth().currentUser?.uid ?? ""
+        Database.fetchUserWithUID(uid: uid) { result in
+            switch result {
+            case .success(let user):
+                self.user = user
+                self.navigationItem.title = self.user?.username
+                self.collectionView.reloadData()
+                self.paginatePosts()
+            case .failure(let error):
+                print("errro 1:", error)
+            }
+        }
+    }
+
 
     fileprivate func setupLogOutButton() {
         navigationItem.rightBarButtonItem = .init(image: #imageLiteral(resourceName: "gear"), style: .plain, target: self, action: #selector(handleLogOut))
@@ -70,22 +109,6 @@ class UserProfileController: UICollectionViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-    private func fetchUser() {
-        let uid = userId ?? Auth.auth().currentUser?.uid ?? ""
-        let database = Database.database().reference().child("users")
-        database.child(uid).observe(.value) { (snapshot) in
-            print(snapshot.value ?? "")
-            guard let dictionary = snapshot.value as? [String: Any] else { return }
-            self.user = .init(uid: uid, dictionary: dictionary)
-            self.navigationItem.title = self.user?.username
-            self.collectionView.reloadData()
-            self.fetchOrderedPosts()
-        } withCancel: { (error) in
-            print(error)
-        }
-
-    }
-
 }
 
 extension UserProfileController {
@@ -94,15 +117,35 @@ extension UserProfileController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserProfileCell.cellId, for: indexPath) as? UserProfileCell else { return .init() }
-        let post = posts[indexPath.item]
-        cell.post = post
-        return cell
+
+        if indexPath.item == self.posts.count - 1 && !isFinishedPaging {
+            paginatePosts()
+        }
+        if isGridView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserProfileCell.cellId, for: indexPath) as? UserProfileCell else { return .init() }
+            let post = posts[indexPath.item]
+            cell.post = post
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomePostCell.cellId, for: indexPath) as? HomePostCell else { return .init() }
+            cell.post = posts[indexPath.item]
+            cell.delegate = self
+            return cell
+        }
+
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.frame.width - 2) / 3
-        return .init(width: width, height: width)
+        if isGridView {
+            let width = (collectionView.frame.width - 2) / 3
+            return .init(width: width, height: width)
+        } else {
+            var height: CGFloat = 40 + 8 + 8
+            height += collectionView.bounds.width
+            height += 50
+            height += 60
+            return .init(width: collectionView.bounds.width, height: height)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -119,10 +162,49 @@ extension UserProfileController: UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: UserProfileHeader.cellId, for: indexPath) as? UserProfileHeader else { return .init() }
         header.user = user
+        header.delegate = self
         return header
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return .init(width: collectionView.bounds.width, height: 200)
+    }
+}
+
+extension UserProfileController: UserProfileHeaderDelegate {
+
+    func didChangeToListView() {
+        isGridView = false
+        collectionView.reloadData()
+    }
+
+    func didChangeToGridView() {
+        isGridView = true
+        collectionView.reloadData()
+    }
+
+}
+
+extension UserProfileController: HomePostCellDelegate {
+
+    func didTapComment(post: Post) {
+        let commentsController: CommentsController = .init()
+        commentsController.post = post
+        navigationController?.pushViewController(commentsController, animated: true)
+    }
+
+    func didLike(for cell: HomePostCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        var post = self.posts[indexPath.item]
+        Database.saveLikes(post: post) { result in
+            switch result {
+            case .success():
+                post.hasLiked = !post.hasLiked
+                self.posts[indexPath.item] = post
+                self.collectionView.reloadItems(at: [indexPath])
+            case .failure(_):
+                break
+            }
+        }
     }
 }

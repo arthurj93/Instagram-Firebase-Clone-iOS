@@ -15,6 +15,7 @@ struct Post {
     let imageHeight: Int
     let imageWidth: Int
     let creationDate: Date
+    var hasLiked: Bool = false
 
     init(user: User, dictionary: [String: Any]) {
         self.user = user

@@ -9,6 +9,7 @@ import UIKit
 
 protocol HomePostCellDelegate: class {
     func didTapComment(post: Post)
+    func didLike(for cell: HomePostCell)
 }
 
 class HomePostCell: UICollectionViewCell {
@@ -20,6 +21,7 @@ class HomePostCell: UICollectionViewCell {
             guard let imageUrl = post?.imageUrl else { return }
             photoImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
             usernameLabel.text = post?.user.username
+            likeButton.setImage(post?.hasLiked == true ? #imageLiteral(resourceName: "like_selected") : #imageLiteral(resourceName: "like_unselected") , for: .normal)
 
             guard let profileImageUrl = post?.user.profileImageUrl else { return }
             userProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
@@ -45,6 +47,7 @@ class HomePostCell: UICollectionViewCell {
         userProfileImageView.layer.cornerRadius = 40/2
 
         commentButton.addTarget(self, action: #selector(handleComment), for: .touchUpInside)
+        likeButton.addTarget(self, action: #selector(handleLike), for: .touchUpInside)
     }
 
     func setAttributedText(post: Post?) {
@@ -66,6 +69,10 @@ class HomePostCell: UICollectionViewCell {
     @objc func handleComment() {
         guard let post = post else { return }
         delegate?.didTapComment(post: post)
+    }
+
+    @objc func handleLike() {
+        delegate?.didLike(for: self)
     }
 
 }

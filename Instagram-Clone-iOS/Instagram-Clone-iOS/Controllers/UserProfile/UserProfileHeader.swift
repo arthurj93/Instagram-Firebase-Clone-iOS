@@ -9,9 +9,16 @@ import UIKit
 import SDWebImage
 import Firebase
 
+protocol UserProfileHeaderDelegate: class {
+    func didChangeToListView()
+    func didChangeToGridView()
+}
+
 class UserProfileHeader: UICollectionViewCell {
 
     static let cellId = "UserProfileHeader"
+
+    weak var delegate: UserProfileHeaderDelegate?
 
     var user: User? {
         didSet {
@@ -28,6 +35,8 @@ class UserProfileHeader: UICollectionViewCell {
     @IBOutlet weak var followersLabel: UILabel!
     @IBOutlet weak var followingLabel: UILabel!
     @IBOutlet weak var editProfileFollowButton: UIButton!
+    @IBOutlet weak var listButton: UIButton!
+    @IBOutlet weak var gridButton: UIButton!
     override func awakeFromNib() {
         super.awakeFromNib()
         setupView()
@@ -39,6 +48,21 @@ class UserProfileHeader: UICollectionViewCell {
         editProfileFollowButton.layer.borderWidth = 1
         editProfileFollowButton.layer.cornerRadius = 3
         editProfileFollowButton.addTarget(self, action: #selector(handleEditProfileOrFollow), for: .touchUpInside)
+
+        listButton.addTarget(self, action: #selector(handleChangeToListView), for: .touchUpInside)
+        gridButton.addTarget(self, action: #selector(handleChangeToGridView), for: .touchUpInside)
+    }
+
+    @objc func handleChangeToListView() {
+        listButton.tintColor = .mainBlue
+        gridButton.tintColor = .init(white: 0, alpha: 0.2)
+        delegate?.didChangeToListView()
+    }
+
+    @objc func handleChangeToGridView() {
+        gridButton.tintColor = .mainBlue
+        listButton.tintColor = .init(white: 0, alpha: 0.2)
+        delegate?.didChangeToGridView()
     }
 
     @objc func handleEditProfileOrFollow() {
@@ -102,6 +126,7 @@ class UserProfileHeader: UICollectionViewCell {
     func setupProfileImageView() {
         profileImageView.layer.cornerRadius = 80/2
         profileImageView.clipsToBounds = true
+        profileImageView.backgroundColor = .green
         guard let profileImageUrl = user?.profileImageUrl else { return }
         let url = URL(string: profileImageUrl)
         profileImageView.sd_setImage(with: url)

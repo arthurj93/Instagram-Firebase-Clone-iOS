@@ -90,10 +90,25 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
 extension HomeController: HomePostCellDelegate {
 
     func didTapComment(post: Post) {
-//        let commentsController: CommentsController = .init(collectionViewLayout: UICollectionViewFlowLayout())
         let commentsController: CommentsController = .init()
         commentsController.post = post
         navigationController?.pushViewController(commentsController, animated: true)
+    }
+
+    func didLike(for cell: HomePostCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        var post = self.posts[indexPath.item]
+        print(post.caption)
+        Database.saveLikes(post: post) { result in
+            switch result {
+            case .success():
+                post.hasLiked = !post.hasLiked
+                self.posts[indexPath.item] = post
+                self.collectionView.reloadItems(at: [indexPath])
+            case .failure(_):
+                break
+            }
+        }
     }
 
 }

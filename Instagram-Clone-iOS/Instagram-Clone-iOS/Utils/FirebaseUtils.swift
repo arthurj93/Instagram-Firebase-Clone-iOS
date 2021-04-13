@@ -34,9 +34,17 @@ extension Database {
                 guard let dictionary = value as? [String: Any] else { return }
                 var post: Post = .init(user: user, dictionary: dictionary)
                 post.id = key
-                posts.append(post)
+
+                Database.fetchLikes(post: post) { (result) in
+                    switch result {
+                    case .success(let post):
+                        posts.append(post)
+                        completion(.success(posts))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                }
             }
-            completion(.success(posts))
         } withCancel: { (error) in
             completion(.failure(error))
             print("Failed to fetch posts:", error)
@@ -65,7 +73,7 @@ extension Database {
         }
     }
 
-    static func fetchMyPosts(completion: @escaping (Result<[Post], Error>) -> Void) {
+    static private func fetchMyPosts(completion: @escaping (Result<[Post], Error>) -> Void) {
         //FETCH CURRENT USER POSTS
         guard let uid = Auth.auth().currentUser?.uid else { return }
         Database.fetchUserWithUID(uid: uid) { (result) in
@@ -94,7 +102,6 @@ extension Database {
         //FETCH MY FOLLOWERS AND RETURN A LIST OF USERS
         database.observeSingleEvent(of: .value) { (snapshot) in
             if !snapshot.exists() {
-                print("nao tenho seguidores")
                 completion(.success(sortPosts(posts: allPosts)))
                 return
             }
@@ -129,6 +136,40 @@ extension Database {
         }
     }
 
+    static func fetchLikes(post: Post, completion: @escaping (Result<Post, Error>) -> Void) {
+        guard let postId = post.id else { return }
+        var post = post
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let database = Database.database().reference().child("likes").child(postId).child(uid)
+        database.observeSingleEvent(of: .value) { (snapshot) in
+            if let value = snapshot.value as? Int, value == 1 {
+                post.hasLiked = true
+            } else {
+                post.hasLiked = false
+            }
+            completion(.success(post))
+        } withCancel: { (error) in
+            completion(.failure(error))
+            print("Failed to fetch like:", error)
+        }
+    }
+
+    static func saveLikes(post: Post, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let postId = post.id else { return }
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let values = [uid: post.hasLiked == true ? 0 : 1]
+        let database = Database.database().reference().child("likes").child(postId)
+        database.updateChildValues(values) { (error, reference) in
+            if let error = error {
+                print("Failed to like post:", error)
+                completion(.failure(error))
+                return
+            }
+            completion(.success(()))
+            print("Successfully like the post")
+        }
+    }
+
     //MARK:- Share
 
     static func savePostToDatabaseWithImageURL(postImage: UIImage, caption: String, imageUrl: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -151,7 +192,7 @@ extension Database {
         }
     }
 
-    static private func sortPosts(posts: [Post]) -> [Post] {
+    static func sortPosts(posts: [Post]) -> [Post] {
         var allPosts = posts
         allPosts.sort { (p1, p2) in
             return p1.creationDate.compare(p2.creationDate) == .orderedDescending

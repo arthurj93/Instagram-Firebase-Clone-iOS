@@ -133,6 +133,8 @@
                 <outlet property="editProfileFollowButton" destination="5WM-U8-ws4" id="7JD-MA-G4b"/>
                 <outlet property="followersLabel" destination="ETW-v9-Ahi" id="xNg-MS-0NX"/>
                 <outlet property="followingLabel" destination="z0P-Ei-biA" id="yfc-4G-nVN"/>
+                <outlet property="gridButton" destination="IuC-LH-gih" id="xhG-SM-IU4"/>
+                <outlet property="listButton" destination="AB1-jr-VfL" id="koU-Se-l9O"/>
                 <outlet property="postsLabel" destination="myg-j0-XKl" id="6W6-97-2gq"/>
                 <outlet property="profileImageView" destination="TQf-kN-SEG" id="ToT-gx-G41"/>
                 <outlet property="usernameLabel" destination="4Ww-nQ-yyp" id="9XK-2Y-Nrg"/>
